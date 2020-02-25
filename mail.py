@@ -11,7 +11,7 @@ from settings import mail
 from log import get_log, get_log_content
 
 
-def generate_message(msg):
+def generate_message(msg: str = ''):
 
     message = MIMEMultipart()
 
@@ -19,7 +19,7 @@ def generate_message(msg):
     message['From'] = mail['from']
     message['To'] = mail['to']
 
-    message.attach(MIMEText(f'Размер архива: {msg}', 'plain', 'utf-8'))
+    message.attach(MIMEText(msg, 'plain', 'utf-8'))
 
     file = MIMEText(get_log_content())
     file.add_header('Content-Disposition', 'attachment', filename='log.txt')
@@ -28,7 +28,7 @@ def generate_message(msg):
     return message
 
 
-def send_mail(msg):
+def send_mail(msg: str = ''):
 
     log = get_log()
 
@@ -58,4 +58,4 @@ def send_mail(msg):
 
 
 if __name__ == '__main__':
-    send_mail()
+    pass

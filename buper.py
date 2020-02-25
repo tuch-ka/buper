@@ -103,12 +103,16 @@ def main():
     zip_log, arch_file = zip_files(files_to_archive)
     log.info(
         f'Результаты архивации:\n'
-        f'{str(zip_log)}\n'
+        f'{zip_log.decode("utf-8")}\n'
         f'Файл: {arch_file}\n'
-        f'Свободного места на диске осталось: {get_free_space()}'
+        f'Свободного места на диске осталось: {get_free_space()} Гб'
     )
 
-    send_mail(os.path.getsize(arch_file))
+    count, list_dir = backup_rotation()
+    log.info(f'Было удалено архивов: {count}\n{list_dir}')
+
+    arch_size = round((float(os.path.getsize(arch_file)) / 1024 ** 3), 2)
+    send_mail(f'Размер архива: {arch_size} Гб')
     move_logs(BACKUP_FOLDER)
 
 
