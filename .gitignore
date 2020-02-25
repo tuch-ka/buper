@@ -130,4 +130,5 @@ dmypy.json
 
 # Project settings
 log.txt
+settings.py
 .idea
