@@ -26,7 +26,7 @@ BACKUP_LIFETIME = 7
 
 ''' Настройки архиватора
 '''
-
+ARCH_PASSWORD = 'password'
 
 ''' Настройка почты
 '''
@@ -65,4 +65,8 @@ backup = {
     'folder': BACKUP_FOLDER,
     'count': BACKUP_COUNT,
     'lifetime': BACKUP_LIFETIME,
+}
+
+arch = {
+    'password': ARCH_PASSWORD,
 }
