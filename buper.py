@@ -1,15 +1,21 @@
 """
     Модуль логики резервного копирования
-    TODO: ротация файлов бэкапа
-    TODO: архивирование с использованием 7z
 """
 
 import os
 import shutil
+import subprocess
 
+from datetime import datetime
 from time import time
 
-from settings import base, backup
+from settings import base, backup, arch
+from mail import send_mail
+from log import get_log, move_logs
+
+log = get_log()
+DATE = (datetime.now()).strftime("%Y-%m-%d")
+BACKUP_FOLDER = os.path.join(backup['folder'], DATE)
 
 
 def get_path_list() -> list:
@@ -23,25 +29,24 @@ def get_path_list() -> list:
     for root, folders, files in os.walk(base['folder']):
         folders[:] = [folder for folder in folders if folder not in base['ignore']]
 
-        already_exist = False
-        for path in paths:
-            if root.startswith(path):
-                already_exist = True
-                break
-        if already_exist:
-            continue
-
         for file in files:
             if file.endswith(base['extension']):
-                paths.append(root)
-                # TODO: добавлять папки или файлы. Если файлы, то убрать проверку наличия папки в paths
-                break
+                paths.append(os.path.join(root, file))
 
     return paths
 
 
-def zip_files(src):
-    pass
+def zip_files(src: list):
+    """ Архивирует архив
+    """
+    destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
+    command = ['7z', 'a',
+               destination,
+               *src,
+               f"-p{arch['password']}",
+               ]
+    result = subprocess.run(command, capture_output=True)
+    return result.stdout, destination
 
 
 def backup_rotation() -> tuple:
@@ -54,6 +59,12 @@ def backup_rotation() -> tuple:
     count = 0                               # Счетчик удалённых папок
 
     if backup['lifetime'] < 1 or backup['count'] < 1 or not os.path.exists(backup['folder']):
+        log.info(
+            f"Ротация архивов не выполнена:\n"
+            f"lifetime: {backup['lifetime']}\n"
+            f"count: {backup['count']}\n"
+            f"folder: {backup['folder']}"
+        )
         return count, list_dir
 
     # Отсчет заданного количества дней от текщего аремени, в секундах (86400 - кол-во секунд в сутках)
@@ -67,17 +78,10 @@ def backup_rotation() -> tuple:
                 shutil.rmtree(folder_path, ignore_errors=True)
 
                 if os.path.exists(folder_path):
-                    # TODO: log error
-                    print(f'error {folder_path}')
+                    log.error(f'Удаление старого архива не удалось: {folder_path}')
                     continue
-                # TODO: log
-                print(f'good {folder_path}')
                 list_dir.append(folder_path)
                 count += 1
-            else:   # TODO: debug info
-                print(f'young {folder_path}')
-        else:   # TODO: debug info
-            print(f'not dir {folder_path}')
 
     return count, list_dir
 
@@ -90,8 +94,24 @@ def get_free_space() -> float:
     return round((stat[2] / 1024 ** 3), 2)
 
 
+def main():
+    log.info(f'Начало резервного копирования')
+
+    files_to_archive = get_path_list()
+    log.info(f'Список файлов для архивации:\n{files_to_archive}')
+
+    zip_log, arch_file = zip_files(files_to_archive)
+    log.info(
+        f'Результаты архивации:\n'
+        f'{str(zip_log)}\n'
+        f'Файл: {arch_file}\n'
+        f'Свободного места на диске осталось: {get_free_space()}'
+    )
+
+    send_mail(os.path.getsize(arch_file))
+    move_logs(BACKUP_FOLDER)
+
+
 if __name__ == '__main__':
-    print(f'Будут запакованы: {get_path_list()}')
-    print(f'Свободно на диске: {get_free_space()} Гб')
-    backup_rotation()
+    main()
 
