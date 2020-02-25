@@ -4,31 +4,39 @@
 
 from datetime import datetime
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from smtplib import SMTP
 
 from settings import mail
-from log import get_mail_log, get_log_content
+from log import get_log, get_log_content
 
 
-def generate_message():
+def generate_message(msg):
 
-    message = MIMEText(get_log_content(), 'plain', 'utf-8')
+    message = MIMEMultipart()
 
-    message['Subject'] = f'BackUp system {(datetime.now()).strftime("%Y-%m-%d")}'
+    message['Subject'] = f'BackUp {(datetime.now()).strftime("%Y-%m-%d")}'
     message['From'] = mail['from']
     message['To'] = mail['to']
+
+    message.attach(MIMEText(f'Размер архива: {msg}', 'plain', 'utf-8'))
+
+    file = MIMEText(get_log_content())
+    file.add_header('Content-Disposition', 'attachment', filename='log.txt')
+    message.attach(file)
 
     return message
 
 
-def send_mail():
+def send_mail(msg):
 
-    log = get_mail_log()
+    log = get_log()
 
     mail_server = SMTP(
         mail['server'],
         mail['port']
     )
+    mail_server.starttls()
 
     try:
         mail_server.login(
@@ -36,10 +44,8 @@ def send_mail():
             mail['password']
         )
 
-        mail_server.sendmail(
-            mail['from'],
-            mail['to'],
-            generate_message().as_string()
+        mail_server.send_message(
+            generate_message(msg)
         )
 
         log.info('Email успешно отправлен на сервер')
