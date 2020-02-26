@@ -32,6 +32,10 @@ def send_mail(msg: str = ''):
 
     log = get_log()
 
+    if not mail['enable']:
+        log.info('Отправка email отключена')
+        return
+
     mail_server = SMTP(
         mail['server'],
         mail['port']

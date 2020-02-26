@@ -31,6 +31,7 @@ ARCH_EXEC = r'c:\Program Files\7-Zip\7z.exe'
 
 ''' Настройка почты
 '''
+MAIL_ENABLE = True
 MAIL_SERVER = 'mail.ru'
 MAIL_PORT = 25
 MAIL_TO_ADDRESS = 'example@mail.ru'
@@ -59,7 +60,8 @@ mail = {
     'port': MAIL_PORT,
     'password': MAIL_PASSWORD,
     'from': MAIL_USER,
-    'to': MAIL_TO_ADDRESS
+    'to': MAIL_TO_ADDRESS,
+    'enable': MAIL_ENABLE
 }
 
 backup = {
