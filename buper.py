@@ -24,15 +24,16 @@ def get_path_list() -> list:
         -   не входят в игнор лист
         -   содержат в себе файлы с искомым расширением
     """
-    paths = []
+    paths = ''
 
     for root, folders, files in os.walk(os.path.normpath(base['folder'])):
         folders[:] = [folder for folder in folders if folder not in base['ignore']]
 
         for file in files:
-            if file.endswith(base['extension']):
-                paths.append(f'"{os.path.join(root, file)}"')
+            if file.endswith(base['extension']) and not file.startswith('0x'):
+                paths += f'"{os.path.join(root, file)}" '
 
+    #print(paths)
     return paths
 
 
@@ -40,11 +41,13 @@ def zip_files(src: list):
     """ Архивирует архив
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
-    command = [arch['exec'], 'a',
+    """command = [arch['exec'], 'a',
                destination,
-               *src,
+               src,
                f"-p{arch['password']}",
-               ]
+               ]"""
+    command = f"{arch['exec']} x {destination} {src} -p{arch['password']}"
+    #print(command)
     result = subprocess.run(command, capture_output=True)
     # TODO: обработать ошибки 7z
     return result.stdout, result.stderr, destination
