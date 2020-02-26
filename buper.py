@@ -45,7 +45,10 @@ def zip_files(src: str):
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
     command = f"{arch['exec']} a -spf2 -mhe {destination} {src} -p{arch['password']}"
-    result = subprocess.run(command, capture_output=True)
+    try:
+        result = subprocess.run(command, capture_output=True)
+    except Exception as e:
+        return '', e, destination
     return result.stdout, result.stderr, destination
 
 
