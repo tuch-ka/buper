@@ -18,38 +18,34 @@ DATE = (datetime.now()).strftime("%Y-%m-%d")
 BACKUP_FOLDER = os.path.join(backup['folder'], DATE)
 
 
-def get_path_list() -> list:
+def get_path_list() -> str:
     """
-    Составляет список папок, которые:
-        -   не входят в игнор лист
-        -   содержат в себе файлы с искомым расширением
+    Составляет список папок, которые не входят в игнор лист
     """
     paths = ''
+    root = os.path.normpath(base['folder'])
+    ext = base["extension"]
 
-    for root, folders, files in os.walk(os.path.normpath(base['folder'])):
-        folders[:] = [folder for folder in folders if folder not in base['ignore']]
+    folders = os.listdir(root)
+    folders[:] = [
+        folder
+        for folder in folders
+        if folder not in base['ignore']
+    ]
 
-        for file in files:
-            if file.endswith(base['extension']) and not file.startswith('0x'):
-                paths += f'"{os.path.join(root, file)}" '
-
-    #print(paths)
+    for folder in folders:
+        folder_path = os.path.join(root, folder)
+        if os.path.isdir(folder_path):
+            paths += f'"{folder_path}\\*{ext}" '
     return paths
 
 
-def zip_files(src: list):
+def zip_files(src: str):
     """ Архивирует архив
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
-    """command = [arch['exec'], 'a',
-               destination,
-               src,
-               f"-p{arch['password']}",
-               ]"""
-    command = f"{arch['exec']} x {destination} {src} -p{arch['password']}"
-    #print(command)
+    command = f"{arch['exec']} a -r -mhe {destination} {src} -p{arch['password']}"
     result = subprocess.run(command, capture_output=True)
-    # TODO: обработать ошибки 7z
     return result.stdout, result.stderr, destination
 
 
@@ -101,10 +97,10 @@ def get_free_space() -> float:
 def main():
     log.info(f'Начало резервного копирования')
 
-    files_to_archive = get_path_list()
-    # log.info(f"Список файлов для архивации:\n{files_to_archive}")
+    folders_to_archive = get_path_list()
+    log.info(f"Список файлов для архивации:\n{folders_to_archive}")
 
-    zip_log, zip_error, arch_file = zip_files(files_to_archive)
+    zip_log, zip_error, arch_file = zip_files(folders_to_archive)
     if zip_error:
         log.error(zip_error.decode("cp866", errors="ignore"))
         return ''
