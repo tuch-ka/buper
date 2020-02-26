@@ -31,7 +31,7 @@ def get_path_list() -> list:
 
         for file in files:
             if file.endswith(base['extension']):
-                paths.append(os.path.join(root, file))
+                paths.append(f'"{os.path.join(root, file)}"')
 
     return paths
 
@@ -47,7 +47,7 @@ def zip_files(src: list):
                ]
     result = subprocess.run(command, capture_output=True)
     # TODO: обработать ошибки 7z
-    return result.stdout, destination
+    return result.stdout, result.stderr, destination
 
 
 def backup_rotation() -> tuple:
@@ -99,13 +99,15 @@ def main():
     log.info(f'Начало резервного копирования')
 
     files_to_archive = get_path_list()
-    log.info(f"Список файлов для архивации:\n{files_to_archive}")
+    # log.info(f"Список файлов для архивации:\n{files_to_archive}")
 
-    zip_log, arch_file = zip_files(files_to_archive)
+    zip_log, zip_error, arch_file = zip_files(files_to_archive)
+    if zip_error:
+        log.error(zip_error.decode("cp866", errors="ignore"))
+        return ''
     log.info(
         f'Результаты архивации:\n'
         f'{zip_log.decode("utf-8")}\n'
-        f'Файл: {arch_file}\n'
         f'Свободного места на диске осталось: {get_free_space()} Гб'
     )
 
