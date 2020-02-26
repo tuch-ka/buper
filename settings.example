@@ -5,7 +5,7 @@
 ''' Расположение копируемого источника
 '''
 # Папка с базами
-BASE_1C = r'c:\tmp'
+BASE_1C = r'c:\\'
 # Расширение файлов, которые надо архивировать
 # EXTENSION_1C = '' - копировать все файлы
 EXTENSION_1C = '.1cd'
@@ -27,6 +27,7 @@ BACKUP_LIFETIME = 7
 ''' Настройки архиватора
 '''
 ARCH_PASSWORD = 'password'
+ARCH_EXEC = r'c:\Program Files\7-Zip\7z.exe'
 
 ''' Настройка почты
 '''
@@ -69,4 +70,5 @@ backup = {
 
 arch = {
     'password': ARCH_PASSWORD,
+    'exec': ARCH_EXEC,
 }

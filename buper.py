@@ -26,7 +26,7 @@ def get_path_list() -> list:
     """
     paths = []
 
-    for root, folders, files in os.walk(base['folder']):
+    for root, folders, files in os.walk(os.path.normpath(base['folder'])):
         folders[:] = [folder for folder in folders if folder not in base['ignore']]
 
         for file in files:
@@ -40,12 +40,13 @@ def zip_files(src: list):
     """ Архивирует архив
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
-    command = ['7z', 'a',
+    command = [arch['exec'], 'a',
                destination,
                *src,
                f"-p{arch['password']}",
                ]
     result = subprocess.run(command, capture_output=True)
+    # TODO: обработать ошибки 7z
     return result.stdout, destination
 
 
@@ -98,7 +99,7 @@ def main():
     log.info(f'Начало резервного копирования')
 
     files_to_archive = get_path_list()
-    log.info(f'Список файлов для архивации:\n{files_to_archive}')
+    log.info(f"Список файлов для архивации:\n{files_to_archive}")
 
     zip_log, arch_file = zip_files(files_to_archive)
     log.info(
