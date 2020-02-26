@@ -42,8 +42,6 @@ def check_settings() -> bool:
         print(f'Исполняемый файл архиватора {ARCH_EXEC} не найден')
         return False
 
-    # TODO: проверить доступность mail сервера
-
     if not isinstance(LOG_FOLDER, str):
         print(r"LOG_FOLDER должен быть стройкой. Если не важно - пустая строка '', "
               r"лог в любом случае будет перемещаться в папку с архивом")
