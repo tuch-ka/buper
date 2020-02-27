@@ -45,6 +45,7 @@ def zip_files(src: str):
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
     command = f"{arch['exec']} a -spf2 -mhe {destination} {src} -p{arch['password']}"
+    log.debug(f'Zip command: {command}')
     try:
         result = subprocess.run(command, capture_output=True)
     except Exception as e:
@@ -101,7 +102,7 @@ def main():
     log.info(f'Начало резервного копирования')
 
     folders_to_archive = get_path_list()
-    log.info(f"Список файлов для архивации:\n{folders_to_archive}")
+    log.debug(f"Список файлов для архивации:\n{folders_to_archive}")
 
     zip_log, zip_error, arch_file = zip_files(folders_to_archive)
     if zip_error:

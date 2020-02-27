@@ -25,7 +25,7 @@ def get_log_content():
 def get_log():
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format='%(asctime)s: %(filename)s[LINE:%(lineno)d]# %(levelname)s - %(message)s',
         filename=log_file,
     )
