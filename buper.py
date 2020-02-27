@@ -44,7 +44,7 @@ def zip_files(src: str):
     """ Архивирует архив
     """
     destination = os.path.join(BACKUP_FOLDER, DATE + '.7z')
-    command = f"{arch['exec']} a -spf2 -mhe {destination} {src} -p{arch['password']}"
+    command = f"{arch['exec']} a -r -spf2 -mhe {destination} {src} -p{arch['password']}"
     log.debug(f'Zip command: {command}')
     try:
         result = subprocess.run(command, capture_output=True)
