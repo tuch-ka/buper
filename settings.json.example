@@ -1,0 +1,15 @@
+{
+  "source": "c:\\",
+  "ignore": ["1Cv8FTxt"],
+  "destination": "C:\\backups",
+  "count": 10,
+  "lifetime": 7,
+  "7z_password": "password",
+  "7z_exec": "c:\\Program Files\\7-Zip\\7z.exe",
+  "mail_enable": true,
+  "server": "mail.ru",
+  "port": 25,
+  "to_address": "example@mail.ru",
+  "user": "example@mail.ru",
+  "password": ""
+}
