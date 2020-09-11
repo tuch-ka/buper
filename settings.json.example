@@ -11,5 +11,7 @@
   "port": 25,
   "to_address": "example@mail.ru",
   "user": "example@mail.ru",
-  "password": ""
+  "password": "",
+  "log_filename": "log.txt",
+  "log_folder": ""
 }
