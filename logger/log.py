@@ -8,7 +8,7 @@ from config.log import conf_log
 class Log:
 
     @staticmethod
-    def get_log():
+    def get_logger():
         """
         Возвращает объект logger
         """
@@ -41,7 +41,7 @@ class Log:
             try:
                 os.mkdir(dst)
             except OSError as error:
-                log = cls.get_log()
+                log = cls.get_logger()
                 log.error(f'Не удалось переместить лог.\nОшибка при создании папки "{dst}":\n{error}')
                 return None
 
@@ -51,7 +51,7 @@ class Log:
         try:
             shutil.move(conf_log.file, dst_file)
         except shutil.Error as error:
-            log = cls.get_log()
+            log = cls.get_logger()
             log.error(f'Не удалось переместить лог.\nОшибка при перемещении в {dst_file}:\n{error}')
 
         return None
