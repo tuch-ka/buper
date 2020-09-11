@@ -17,6 +17,7 @@ class Buper:
         self.archive = os.path.join(self.folder, self.date + '.7z')
 
         self.files = self._files()
+        self.arch_size = None
 
     def get_free_space(self) -> float:
         """
@@ -34,6 +35,7 @@ class Buper:
 
         try:
             result = subprocess.run(command, capture_output=True)
+            self.arch_size = round((float(os.path.getsize(self.archive)) / 1024 ** 3), 2)
         except Exception as e:
             return '', e
         return result.stdout, result.stderr
