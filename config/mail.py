@@ -22,7 +22,7 @@ class EMailConfig(ConfigFromJSONFile):
     def _get_server(self):
         return self.settings.get('server')
 
-    def _get_port(self, default=25) -> int:
+    def _get_port(self, default=465) -> int:
         port = self.settings.get('port')
         if not isinstance(port, int):
             try:
