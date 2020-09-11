@@ -15,7 +15,7 @@ class Log:
         logging.basicConfig(
             level=logging.DEBUG,
             format='%(asctime)s: %(filename)s[LINE:%(lineno)d]# %(levelname)s - %(message)s',
-            filename=conf_log.filename,
+            filename=conf_log.file,
         )
 
         return logging.getLogger('buper')
