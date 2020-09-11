@@ -5,8 +5,8 @@ from config import ConfigFromJSONFile
 class Config7Z(ConfigFromJSONFile):
 
     def __init__(self):
-        self.password_7z = self._get_7z_password()
-        self.exec_7z = self._get_7z_exec()
+        self.password = self._get_7z_password()
+        self.exec = self._get_7z_exec()
 
     def _get_7z_password(self):
         return self.settings.get('7z_password')
