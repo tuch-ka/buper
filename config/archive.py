@@ -13,6 +13,7 @@ class Config7Z(ConfigFromJSONFile):
 
     def _get_7z_exec(self):
         exe = self.settings.get('7z_exec')
+        exe = 'c:\\Program Files\\7-Zip\\7z.exe' if exe is None else exe
         # TODO: для отладки в ubuntu
         return exe
         # if isinstance(exe, str) and os.path.exists(exe):
