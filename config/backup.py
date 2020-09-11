@@ -47,7 +47,7 @@ class BackUpConfig(ConfigFromJSONFile):
         if not isinstance(count, int):
             try:
                 count = int(count)
-            except ValueError:
+            except (ValueError, TypeError):
                 count = default
         return count if count >= 0 else default
 
@@ -56,7 +56,7 @@ class BackUpConfig(ConfigFromJSONFile):
         if not isinstance(lifetime, int):
             try:
                 lifetime = int(lifetime)
-            except ValueError:
+            except (ValueError, TypeError):
                 lifetime = default
         return lifetime if lifetime >= 0 else default
 
