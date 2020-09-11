@@ -32,8 +32,7 @@ class Log:
             message = file.read()
         return message
 
-    @classmethod
-    def move(cls, dst) -> None:
+    def move(self, dst) -> None:
         """
         Перемещает лог-файл в указанную папку
         """
@@ -41,7 +40,7 @@ class Log:
             try:
                 os.mkdir(dst)
             except OSError as error:
-                log = cls.get_logger()
+                log = self.get_logger()
                 log.error(f'Не удалось переместить лог.\nОшибка при создании папки "{dst}":\n{error}')
                 return None
 
@@ -51,7 +50,7 @@ class Log:
         try:
             shutil.move(conf_log.file, dst_file)
         except shutil.Error as error:
-            log = cls.get_logger()
+            log = self.get_logger()
             log.error(f'Не удалось переместить лог.\nОшибка при перемещении в {dst_file}:\n{error}')
 
         return None

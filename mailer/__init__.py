@@ -37,7 +37,7 @@ class Mail:
             logger.info('Email успешно отправлен на сервер')
 
         except SMTPException as e:
-            log.error(f'Ошибка при отправке email: {e}')
+            logger.error(f'Ошибка при отправке email: {e}')
 
         finally:
             mail_server.quit()
