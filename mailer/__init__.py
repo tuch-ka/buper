@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from smtplib import SMTP_SSL, SMTPException
 
 from config.mail import conf_email
-from logger import log, logger
+from logger import logger
 
 
 class Mail:
@@ -42,8 +42,14 @@ class Mail:
         finally:
             mail_server.quit()
 
-    def _generate_message(self):
+    def add_log_file(self, text, filename='log.txt'):
+        """Добавляет текст в приложение"""
+        file = MIMEText(text)
+        file.add_header('Content-Disposition', 'attachment', filename=filename)
+        self.message.attach(file)
 
+    def _generate_message(self):
+        """Генерирует объект сообщения"""
         message = MIMEMultipart()
 
         message['Subject'] = f'BackUp {(datetime.now()).strftime("%Y-%m-%d")}'
@@ -51,10 +57,6 @@ class Mail:
         message['To'] = conf_email.to_address
 
         message.attach(MIMEText(self.text, 'plain', 'utf-8'))
-
-        file = MIMEText(log.read_log())
-        file.add_header('Content-Disposition', 'attachment', filename='log.txt')
-        message.attach(file)
 
         return message
 

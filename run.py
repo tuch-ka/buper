@@ -1,8 +1,6 @@
 from buper import Buper
 from logger import logger, log
 from mailer import Mail
-# from check import check_settings
-# from buper import main
 
 
 def main():
@@ -24,7 +22,10 @@ def main():
             logger.info(f'Было удалено архивов: {count}\n{list_dir}')
 
         message = f'Размер архива: {backup.arch_size} Гб'
+        log_text = log.read_log()
+
         mail = Mail(message)
+        mail.add_log_file(log_text)
         mail.send()
 
         log.move(dst=backup.folder)
@@ -34,5 +35,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # if check_settings():
     main()
