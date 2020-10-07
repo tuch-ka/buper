@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from datetime import datetime
 from time import time
-from typing import Tuple, Union, Generator
+from typing import Tuple, Union, Generator, Optional
 
 from config.backup import conf_backup
 from logger import logger
@@ -17,7 +17,8 @@ class BaseBuper:
         self.archive = os.path.join(self.folder, self.date + '.7z')
 
         self.files = self._files()
-        self.arch_size = None
+        self._arch_size = None
+        self._free_space = None
 
     def create_zip(self) -> Tuple[str, Union[Exception, str, None]]:
         """
@@ -38,7 +39,6 @@ class BaseBuper:
                 response = result.stdout.decode("utf-8")
                 error = None
                 logger.debug('Архивация выполнена без ошибок')
-                self.arch_size = round((float(os.path.getsize(self.archive)) / 1024 ** 3), 2)
 
         except Exception as error:
             response = ''
@@ -47,12 +47,42 @@ class BaseBuper:
 
         return response, error
 
-    def get_free_space(self) -> float:
+    @property
+    def free_space(self) -> float:
         """
         Возращает размер свободного пространста в гигабайтах
         """
+        if self._free_space is not None:
+            return self._free_space
+
         statistic = shutil.disk_usage(self.folder)
-        return round((statistic[2] / 1024 ** 3), 2)
+        self._free_space = round((statistic[2] / 1024 ** 3), 2)
+
+        logger.debug(f'Свободного места на диске осталось: {self._free_space} Гб')
+        return self._free_space
+
+    @property
+    def arch_size(self) -> Optional[float]:
+        if self._arch_size is not None:
+            return self._arch_size
+        elif not os.path.exists(self.archive):
+            return None
+
+        size_bytes = float(os.path.getsize(self.archive))
+        size_gigabytes = size_bytes / 1024 ** 3
+        self._arch_size = round(size_gigabytes, 2)
+
+        logger.debug(f'Размер архива: {self._arch_size} Гб')
+        return self._arch_size
+
+    def check_disk_capacity(self) -> float:
+        if self.arch_size is not None and self.arch_size > 0:
+            disk_capacity = self.free_space / self.arch_size
+        else:
+            disk_capacity = float('inf')
+
+        logger.debug(f'На диске осталось место для {disk_capacity} архивов')
+        return disk_capacity
 
     def delete_old_backups(self) -> Tuple[int, list]:
         """ Удаляет папки архива старше заданного количества дней, если они указаны

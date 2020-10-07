@@ -16,9 +16,14 @@ def main():
     else:
         mail_message = f'Размер архива: {backup.arch_size} Гб'
 
+        capacity = backup.check_disk_capacity()
+        if capacity < 4:
+            logger.warning(f'На диске осталось {backup.free_space} Гб')
+            logger.warning(f'Места хватит для {capacity} архивов')
+            mail_message += f'\nВНИМАНИЕ! Заканчивается место!'
+
         logger.info('Результаты архивации:')
         logger.info(zip_message)
-        logger.warning(f'Свободного места на диске осталось: {backup.get_free_space()} Гб')
 
         count, list_dir = backup.delete_old_backups()
         if count:
