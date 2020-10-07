@@ -16,12 +16,12 @@ class Config7Z(ConfigFromJSONFile):
         exe = self.settings.get('7z_exec')
 
         if sys.platform == 'win32':
-            exe = 'c:\\Program Files\\7-Zip\\7z.exe' if exe is None else exe
+            exe = exe or 'c:\\Program Files\\7-Zip\\7z.exe'
             if not isinstance(exe, str) or not os.path.exists(exe):
                 raise Exception(f'Wrong path to 7z.exe file: {exe}')
 
         elif sys.platform in ('linux', 'linux2'):
-            exe = '7z' if exe is None else exe
+            exe = exe or '7z'
             if not isinstance(exe, str):
                 raise Exception(f'Wrong path to 7z: {exe}')
 

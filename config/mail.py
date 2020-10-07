@@ -27,7 +27,7 @@ class EMailConfig(ConfigFromJSONFile):
         if not isinstance(port, int):
             try:
                 port = int(port)
-            except ValueError:
+            except (ValueError, TypeError):
                 port = default
         return port
 

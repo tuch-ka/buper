@@ -1,5 +1,6 @@
 import os
 from config import ConfigFromJSONFile
+from logger import logger
 
 
 class BackUpConfig(ConfigFromJSONFile):
@@ -38,7 +39,7 @@ class BackUpConfig(ConfigFromJSONFile):
                 os.mkdir(dst)
                 return dst
             except OSError:
-                pass
+                logger.error(f'Не удалось создать папку назначения: {dst}')
 
         return os.getcwd()
 

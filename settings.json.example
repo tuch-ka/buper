@@ -13,5 +13,6 @@
   "user": "example@mail.ru",
   "password": "",
   "log_filename": "log.txt",
-  "log_folder": ""
+  "log_folder": "",
+  "log_level": "debug"
 }

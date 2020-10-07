@@ -24,7 +24,7 @@ class Mail:
     def send(self) -> None:
 
         if not conf_email.mail_enable:
-            logger.info('Отправка email отключена')
+            logger.warning('Отправка email отключена')
             return None
 
         mail_server = SMTP_SSL(

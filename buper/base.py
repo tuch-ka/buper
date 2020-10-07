@@ -26,23 +26,24 @@ class BaseBuper:
         """
         command = self._generate_command()
 
-        logger.debug(f'Zip command: {command}')
-
         try:
             result = subprocess.run(command, capture_output=True)
 
             if result.stderr:
                 response = ''
                 error = result.stderr.decode("cp866", errors="ignore")
+                logger.error(f'Ошибка архиватора при создании архива: {error}')
 
             else:
                 response = result.stdout.decode("utf-8")
                 error = None
+                logger.debug('Архивация выполнена без ошибок')
                 self.arch_size = round((float(os.path.getsize(self.archive)) / 1024 ** 3), 2)
 
-        except Exception as e:
+        except Exception as error:
             response = ''
-            error = e
+            error = error
+            logger.error(f'Ошибка системы при создании архива: {error}')
 
         return response, error
 
@@ -61,7 +62,7 @@ class BaseBuper:
         """
 
         if not conf_backup.lifetime or not conf_backup.count or not os.path.exists(conf_backup.dst):
-            logger.info(
+            logger.warning(
                 f"Ротация архивов не выполнена:\n"
                 f"lifetime: {conf_backup.lifetime}\n"
                 f"count: {conf_backup.count}\n"
@@ -92,9 +93,10 @@ class BaseBuper:
                     shutil.rmtree(folder_path)
                     list_dir.append(folder_path)
                     count += 1
+                    logger.debug(f'Удалён старый архив: {folder_path}')
 
                 except shutil.Error as error:
-                    logger.error(f'Удаление старого архива не удалось: {folder_path}\n{error}')
+                    logger.warning(f'Удаление старого архива не удалось: {folder_path}\n{error}')
 
         return count, list_dir
 

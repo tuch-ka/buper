@@ -13,7 +13,7 @@ class Log:
         Возвращает объект logger
         """
         logging.basicConfig(
-            level=logging.DEBUG,
+            level=conf_log.level,
             format='%(asctime)s: %(filename)s[LINE:%(lineno)d]# %(levelname)s - %(message)s',
             filename=conf_log.file,
         )

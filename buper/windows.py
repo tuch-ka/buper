@@ -1,5 +1,6 @@
 from config.archive import conf_7z
 from .base import BaseBuper
+from logger import logger
 
 
 class WindowsBuper(BaseBuper):
@@ -8,8 +9,12 @@ class WindowsBuper(BaseBuper):
 
         if conf_7z.password is not None:
             command += f' -p{conf_7z.password}'
+
+        logger.debug(f'Сформированная команда для архиватора:\n{command}')
         return command
 
     def _files(self) -> str:
         paths = [f'"{path}"' for path in self._generate_file_paths()]
+        logger.debug(f'Отобрано файлов для архивации: {len(paths)}')
+        logger.debug(paths)
         return ' '.join(paths)
