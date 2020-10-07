@@ -27,7 +27,7 @@ class BaseBuper:
 
     def create_zip(self) -> tuple:
         """
-        Формирует и исполняет команду для 7z
+        Выполняет команду для 7z
         """
         command = self._generate_command()
 
@@ -35,10 +35,21 @@ class BaseBuper:
 
         try:
             result = subprocess.run(command, capture_output=True)
-            self.arch_size = round((float(os.path.getsize(self.archive)) / 1024 ** 3), 2)
+
+            if result.stderr:
+                response = ''
+                error = result.stderr.decode("cp866", errors="ignore")
+
+            else:
+                response = result.stdout.decode("utf-8")
+                error = None
+                self.arch_size = round((float(os.path.getsize(self.archive)) / 1024 ** 3), 2)
+
         except Exception as e:
-            return '', e
-        return result.stdout, result.stderr
+            response = ''
+            error = e
+
+        return response, error
 
     def _generate_command(self):
         """

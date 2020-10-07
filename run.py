@@ -7,25 +7,25 @@ def main():
     logger.info(f'Начало резервного копирования')
     backup = Buper()
 
-    zip_log, zip_error = backup.create_zip()
+    zip_message, zip_error = backup.create_zip()
 
-    if zip_error:
-        try:
-            logger.error(zip_error.decode("cp866", errors="ignore"))
-        except Exception as e:
-            logger.error(e)
+    if zip_error is not None:
+        logger.error(zip_error)
+        message = f'Ошибка архивации!'
 
-    logger.info(
-        f'Результаты архивации:\n'
-        f'{zip_log.decode("utf-8")}\n'
-        f'Свободного места на диске осталось: {backup.get_free_space()} Гб'
-    )
+    else:
+        message = f'Размер архива: {backup.arch_size} Гб'
 
-    count, list_dir = backup.delete_old_backups()
-    if count:
-        logger.info(f'Было удалено архивов: {count}\n{list_dir}')
+        logger.info(
+            f'Результаты архивации:\n'
+            f'{zip_message}\n'
+            f'Свободного места на диске осталось: {backup.get_free_space()} Гб'
+        )
 
-    message = f'Размер архива: {backup.arch_size} Гб'
+        count, list_dir = backup.delete_old_backups()
+        if count:
+            logger.info(f'Было удалено архивов: {count}\n{list_dir}')
+
     log_text = log.read_log()
 
     mail = Mail(content=message, attachment=log_text)
