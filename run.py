@@ -10,8 +10,10 @@ def main():
     zip_log, zip_error = backup.create_zip()
 
     if zip_error:
-        logger.error(zip_error.decode("cp866", errors="ignore"))
-        return
+        try:
+            logger.error(zip_error.decode("cp866", errors="ignore"))
+        except Exception as e:
+            logger.error(e)
 
     logger.info(
         f'Результаты архивации:\n'
@@ -30,7 +32,7 @@ def main():
     mail.send()
 
     log.move(dst=backup.folder)
-        
+
 
 if __name__ == '__main__':
     main()
