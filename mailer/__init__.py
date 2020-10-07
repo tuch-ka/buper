@@ -9,8 +9,10 @@ from logger import logger
 
 class Mail:
 
-    def __init__(self, text: str):
-        self.text = text
+    def __init__(self, content: str, attachment: str = None, attachment_name: str = 'log.txt'):
+        self.content = content
+        self.attachment = attachment
+        self.attachment_name = attachment_name
         self.message = self._generate_message()
 
     def send(self):
@@ -42,12 +44,6 @@ class Mail:
         finally:
             mail_server.quit()
 
-    def add_log_file(self, text, filename='log.txt'):
-        """Добавляет текст в приложение"""
-        file = MIMEText(text)
-        file.add_header('Content-Disposition', 'attachment', filename=filename)
-        self.message.attach(file)
-
     def _generate_message(self):
         """Генерирует объект сообщения"""
         message = MIMEMultipart()
@@ -56,7 +52,12 @@ class Mail:
         message['From'] = conf_email.user
         message['To'] = conf_email.to_address
 
-        message.attach(MIMEText(self.text, 'plain', 'utf-8'))
+        message.attach(MIMEText(self.content, 'plain', 'utf-8'))
+
+        if self.attachment is not None and isinstance(self.attachment_name, str):
+            attachment = MIMEText(self.attachment)
+            attachment.add_header('Content-Disposition', 'attachment', filename=self.attachment_name)
+            message.attach(attachment)
 
         return message
 

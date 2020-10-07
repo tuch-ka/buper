@@ -26,7 +26,7 @@ class Log:
         Считывает информацию из лог-файла
         """
         if not os.path.exists(conf_log.filename):
-            return ''
+            return f'Не найден файл: {conf_log.filename}'
 
         with open(conf_log.filename, 'r') as file:
             message = file.read()
