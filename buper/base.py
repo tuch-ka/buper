@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from datetime import datetime
 from time import time
+from typing import Tuple, Union, Generator
 
 from config.backup import conf_backup
 from logger import logger
@@ -18,16 +19,10 @@ class BaseBuper:
         self.files = self._files()
         self.arch_size = None
 
-    def get_free_space(self) -> float:
+    def create_zip(self) -> Tuple[str, Union[Exception, str, None]]:
         """
-        Возращает размер свободного пространста в гигабайтах
-        """
-        statistic = shutil.disk_usage(self.folder)
-        return round((statistic[2] / 1024 ** 3), 2)
-
-    def create_zip(self) -> tuple:
-        """
-        Выполняет команду для 7z
+        Выполняет команду для 7z.
+        Возвращает консольный вывод и ошибку.
         """
         command = self._generate_command()
 
@@ -51,21 +46,19 @@ class BaseBuper:
 
         return response, error
 
-    def _generate_command(self):
+    def get_free_space(self) -> float:
         """
-        Формирует команду запуска архиватора в зависимости от ОС
+        Возращает размер свободного пространста в гигабайтах
         """
-        raise NotImplemented
+        statistic = shutil.disk_usage(self.folder)
+        return round((statistic[2] / 1024 ** 3), 2)
 
-    @staticmethod
-    def delete_old_backups():
-        """ Удаляет папки архива старше заданного количества дней
+    def delete_old_backups(self) -> Tuple[int, list]:
+        """ Удаляет папки архива старше заданного количества дней, если они указаны
             Возвращает кортеж, в котором:
                 элемент с индексом [0] - количество удалённых папок
                 элемент с индексом [1] - список удалённых папок
         """
-        list_dir = []  # Список удалённых папок
-        count = 0  # Счетчик удалённых папок
 
         if not conf_backup.lifetime or not conf_backup.count or not os.path.exists(conf_backup.dst):
             logger.info(
@@ -74,31 +67,39 @@ class BaseBuper:
                 f"count: {conf_backup.count}\n"
                 f"folder: {conf_backup.dst}"
             )
-            return count, list_dir
+            return 0, []
+
+        return self._remove_old()
+
+    @staticmethod
+    def _remove_old() -> Tuple[int, list]:
+        """
+        Производит удаление старых архивов
+        """
+        count = 0       # Счетчик удалённых папок
+        list_dir = []   # Список удалённых папок
 
         # Отсчет заданного количества дней от текщего аремени, в секундах (86400 - кол-во секунд в сутках)
-        lifetime = time() - (conf_backup.lifetime * 86400)
+        max_lifetime = time() - (conf_backup.lifetime * 86400)
 
         for folder in os.listdir(conf_backup.dst):
             folder_path = os.path.join(conf_backup.dst, folder)
+            folder_lifetime = os.path.getmtime(folder_path)
 
-            if os.path.isdir(folder_path):
-                if os.path.getmtime(folder_path) < lifetime:
-                    shutil.rmtree(folder_path, ignore_errors=True)
+            if os.path.isdir(folder_path) and folder_lifetime < max_lifetime:
 
-                    if os.path.exists(folder_path):
-                        logger.error(f'Удаление старого архива не удалось: {folder_path}')
-                        continue
+                try:
+                    shutil.rmtree(folder_path)
                     list_dir.append(folder_path)
                     count += 1
 
+                except shutil.Error as error:
+                    logger.error(f'Удаление старого архива не удалось: {folder_path}\n{error}')
+
         return count, list_dir
 
-    def _files(self) -> list:
-        raise NotImplemented
-
     @staticmethod
-    def _generate_file_paths():
+    def _generate_file_paths() -> Generator:
         for path, folders, files in os.walk(conf_backup.src):
             for ignored in conf_backup.ignore:
                 if ignored in folders:
@@ -107,3 +108,15 @@ class BaseBuper:
             for file in files:
                 if file not in conf_backup.ignore:
                     yield os.path.join(path, file)
+
+    def _generate_command(self):
+        """
+        Формирует команду запуска архиватора в зависимости от ОС
+        """
+        raise NotImplemented
+
+    def _files(self):
+        """
+        Адаптирует список файлов из метода _generate_file_paths для метода _generate_command в зависимости от ОС
+        """
+        raise NotImplemented

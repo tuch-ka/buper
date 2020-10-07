@@ -3,7 +3,7 @@ from .base import BaseBuper
 
 
 class LinuxBuper(BaseBuper):
-    def _generate_command(self):
+    def _generate_command(self) -> list:
         command = [conf_7z.exec, 'a', '-r', '-spf2', '-mhe', self.archive]
         command += self.files
 
