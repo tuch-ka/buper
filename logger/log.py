@@ -25,11 +25,16 @@ class Log:
         """
         Считывает информацию из лог-файла
         """
-        if not os.path.exists(conf_log.filename):
-            return f'Не найден файл: {conf_log.filename}'
+        try:
+            with open(conf_log.filename, 'r') as file:
+                message = file.read()
 
-        with open(conf_log.filename, 'r') as file:
-            message = file.read()
+        except FileNotFoundError:
+            message = f'Не найден файл: {conf_log.filename}'
+
+        except Exception as error:
+            message = f'Произошла непредвиденная ошибка: {error}'
+
         return message
 
     def move(self, dst) -> None:
