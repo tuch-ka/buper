@@ -65,6 +65,7 @@ class Log:
 
         try:
             shutil.move(self.file, dst_file)
+            self.file = dst_file
         except shutil.Error as error:
             self.logger.error(f'Не удалось переместить лог.\nОшибка при перемещении в {dst_file}:\n{error}')
 
