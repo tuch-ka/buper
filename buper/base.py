@@ -6,7 +6,7 @@ from time import time
 from typing import Tuple, Union, Generator, Optional
 
 from config.backup import conf_backup
-from logger import logger
+from logger import log
 
 
 class BaseBuper:
@@ -25,6 +25,7 @@ class BaseBuper:
         Выполняет команду для 7z.
         Возвращает консольный вывод и ошибку.
         """
+        logger = log.logger
         command = self._generate_command()
 
         try:
@@ -58,7 +59,7 @@ class BaseBuper:
         statistic = shutil.disk_usage(self.folder)
         self._free_space = round((statistic[2] / 1024 ** 3), 2)
 
-        logger.debug(f'Свободного места на диске осталось: {self._free_space} Гб')
+        log.logger.debug(f'Свободного места на диске осталось: {self._free_space} Гб')
         return self._free_space
 
     @property
@@ -72,7 +73,7 @@ class BaseBuper:
         size_gigabytes = size_bytes / 1024 ** 3
         self._arch_size = round(size_gigabytes, 2)
 
-        logger.debug(f'Размер архива: {self._arch_size} Гб')
+        log.logger.debug(f'Размер архива: {self._arch_size} Гб')
         return self._arch_size
 
     def check_disk_capacity(self) -> float:
@@ -81,7 +82,7 @@ class BaseBuper:
         else:
             disk_capacity = float('inf')
 
-        logger.debug(f'На диске осталось место для {disk_capacity} архивов')
+        log.logger.debug(f'На диске осталось место для {disk_capacity} архивов')
         return disk_capacity
 
     def delete_old_backups(self) -> Tuple[int, list]:
@@ -92,7 +93,7 @@ class BaseBuper:
         """
 
         if not conf_backup.lifetime or not conf_backup.count or not os.path.exists(conf_backup.dst):
-            logger.warning(
+            log.logger.warning(
                 f"Ротация архивов не выполнена:\n"
                 f"lifetime: {conf_backup.lifetime}\n"
                 f"count: {conf_backup.count}\n"
@@ -123,10 +124,10 @@ class BaseBuper:
                     shutil.rmtree(folder_path)
                     list_dir.append(folder_path)
                     count += 1
-                    logger.debug(f'Удалён старый архив: {folder_path}')
+                    log.logger.debug(f'Удалён старый архив: {folder_path}')
 
                 except shutil.Error as error:
-                    logger.warning(f'Удаление старого архива не удалось: {folder_path}\n{error}')
+                    log.logger.warning(f'Удаление старого архива не удалось: {folder_path}\n{error}')
 
         return count, list_dir
 

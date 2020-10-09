@@ -3,12 +3,14 @@ import sys
 from .linux import LinuxBuper
 from .windows import WindowsBuper
 
-from logger import logger
+from logger import log
 
 
 class Buper:
 
     def __new__(cls, *args, **kwargs):
+        logger = log.logger
+
         if sys.platform == 'win32':
             logger.debug(f'ОС: {sys.platform}')
             return WindowsBuper()

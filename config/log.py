@@ -8,7 +8,6 @@ class ConfigLog(ConfigFromJSONFile):
         self.level = self._get_level()
         self.filename = self._get_filename()
         self.folder = self._get_folder()
-        self.file = os.path.join(self.folder, self.filename)
 
     def _get_filename(self) -> str:
         filename = self.settings.get('log_filename')

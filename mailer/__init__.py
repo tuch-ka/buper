@@ -5,7 +5,7 @@ from smtplib import SMTP_SSL, SMTPException
 from typing import Optional
 
 from config.mail import conf_email
-from logger import logger
+from logger import log
 
 
 class Mail:
@@ -22,6 +22,8 @@ class Mail:
         self.message = self._generate_message()
 
     def send(self) -> None:
+
+        logger = log.logger
 
         if not conf_email.mail_enable:
             logger.warning('Отправка email отключена')
