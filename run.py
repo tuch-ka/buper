@@ -1,7 +1,6 @@
 from buper import Buper
 from logger import log
 from mailer import Mail
-from config import MAX_CAPACITY
 
 
 def main():
@@ -26,9 +25,8 @@ def main():
             logger.info(f'Было удалено архивов: {count}\n{list_dir}')
 
         capacity = backup.check_disk_capacity()
-        if capacity < MAX_CAPACITY + 1:
+        if capacity:
             logger.warning(f'На диске осталось {backup.free_space} Гб')
-            logger.warning(f'Места хватит для {capacity} архивов')
             mail_message += f'\nВНИМАНИЕ! Заканчивается место! Свободно {backup.free_space} Гб'
 
     mail_log = log.read_log()

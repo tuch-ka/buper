@@ -76,7 +76,7 @@ class BaseBuper:
         log.logger.debug(f'Размер архива: {self._arch_size} Гб')
         return self._arch_size
 
-    def check_disk_capacity(self) -> float:
+    def calculate_disk_capacity(self) -> float:
         if self.arch_size is not None and self.arch_size > 0:
             disk_capacity = self.free_space / self.arch_size
         else:
@@ -84,6 +84,12 @@ class BaseBuper:
 
         log.logger.debug(f'На диске осталось место для {disk_capacity} архивов')
         return disk_capacity
+
+    def check_disk_capacity(self):
+        disk_capacity = self.calculate_disk_capacity()
+        if disk_capacity >= conf_backup.min_capacity:
+            return True
+        return False
 
     def delete_old_backups(self) -> Tuple[int, list]:
         """ Удаляет папки архива старше заданного количества дней, если они указаны

@@ -13,12 +13,19 @@ class BackUpConfig(ConfigFromJSONFile):
         self.dst = self._get_destination()
         self.count = self._get_count()
         self.lifetime = self._get_lifetime()
+        self.min_capacity = self._get_min_capacity()
 
-    def _get_source(self) -> str:
+    def _get_min_capacity(self, default: int = 3) -> int:
+        min_capacity = self.settings.get('min_capacity')
+        if isinstance(min_capacity, int):
+            return min_capacity
+        return default
+
+    def _get_source(self, default: str = os.getcwd()) -> str:
         source = self.settings.get('source')
         if isinstance(source, str) and os.path.exists(source):
             return source
-        return os.getcwd()
+        return default
 
     def _get_ignore(self) -> list:
         ignore = self.settings.get('ignore')
@@ -28,7 +35,7 @@ class BackUpConfig(ConfigFromJSONFile):
             return ignore
         return []
 
-    def _get_destination(self) -> str:
+    def _get_destination(self, default: str = os.getcwd()) -> str:
         dst = self.settings.get('destination')
         if isinstance(dst, str):
 
@@ -40,8 +47,9 @@ class BackUpConfig(ConfigFromJSONFile):
                 return dst
             except OSError:
                 log.logger.error(f'Не удалось создать папку назначения: {dst}')
+                log.logger.error(f'Будет использовано значение по умолчанию: {default}')
 
-        return os.getcwd()
+        return default
 
     def _get_count(self, default=0) -> int:
         count = self.settings.get('count')
