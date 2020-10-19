@@ -25,7 +25,7 @@ def main():
             logger.info(f'Было удалено архивов: {count}\n{list_dir}')
 
         capacity = backup.check_disk_capacity()
-        if capacity:
+        if not capacity:
             logger.warning(f'На диске осталось {backup.free_space} Гб')
             mail_message += f'\nВНИМАНИЕ! Заканчивается место! Свободно {backup.free_space} Гб'
 
